@@ -11,6 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+
+// getting access token fro rest api call..
 func getAccessToken(subscriptionID string) (string, error) {
 	fmt.Println(subscriptionID)
 	cmd := exec.Command("az", "account", "get-access-token", "--query", "accessToken", "--output", "tsv", "--subscription", subscriptionID)
@@ -23,6 +25,7 @@ func getAccessToken(subscriptionID string) (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
+// getting the ACR Details form the azure account.
 func getACRDetails(accessToken, subscriptionID, resourceGroupName, acrName string) (map[string]interface{}, error) {
 	url := fmt.Sprintf("https://management.azure.com/subscriptions/%s/resourceGroups/%s/providers/Microsoft.ContainerRegistry/registries/%s?api-version=2023-06-01-preview", subscriptionID, resourceGroupName, acrName)
 	req, err := http.NewRequest("GET", url, nil)
@@ -63,6 +66,8 @@ func acrDetailsToJSON(acrDetails map[string]interface{}) (string, error) {
 	return string(acrDetailsJSON), nil
 }
 
+
+// checking that ACR is private or not..
 func isACRPrivate(acrDetails map[string]interface{}) string {
 	properties, ok := acrDetails["properties"].(map[string]interface{})
 	if !ok {
@@ -79,6 +84,8 @@ func isACRPrivate(acrDetails map[string]interface{}) string {
 }
 
 
+
+//main test function where we are calling all function and run the test cases.
 func TestPrivateACRWithPrivateEndpoint(t *testing.T) {
 	t.Parallel()
 
